@@ -11,6 +11,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -22,14 +24,81 @@ public class MovieAPIProject {
     
     
     public static String jsonText;
+    
+    
+    public static JSONObject createJSONObject(String line, HttpURLConnection conn){
+        
+        JSONObject json = null;
+        
+        
+        BufferedReader br = null;
+        try {
+            
+            
+            
+         
+            
+            br = new BufferedReader(new InputStreamReader(
+                    (conn.getInputStream())));
+            ;
+            try {
+                
+                
+                
+                
+                
+                StringBuffer response = new StringBuffer();
+                
+                
+                
+                
+                while ((line = br.readLine()) != null) {
+                    response.append(line);
+                }
+                json = new JSONObject(response.toString());
+                
+                
+                
+                
+            } catch (IOException ex) {
+                Logger.getLogger(MovieAPIProject.class.getName()).log(Level.SEVERE, null, ex);
+            }
+           
+            
+            
+            
+            
+        } catch (IOException ex) {
+            Logger.getLogger(MovieAPIProject.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                br.close();
+            } catch (IOException ex) {
+                Logger.getLogger(MovieAPIProject.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+     
+        
+        
+        
+        return json;
+    }
    
  
+  
+    
+    
+    
+    
+    
     public static String popularMovies(String year){
         
         String results = "";
+        String line = "";
      try {
 
-		URL url = new URL("https://api.themoviedb.org/3/discover/movie?api_key=1fc1286e451238f0135931901e9f7392&language=en-US&sort_by=popularity.desc&primary_release_year=" + year
+		URL url = new URL("https://api.themoviedb.org/3/discover/movie?api_key="
+                        + "1fc1286e451238f0135931901e9f7392&language=en-US&sort_by=popularity.desc&primary_release_year=" + year
                         + "");
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		conn.setRequestMethod("GET");
@@ -42,40 +111,23 @@ public class MovieAPIProject {
 					+ conn.getResponseCode());
 		}
 
-                    BufferedReader br = new BufferedReader(new InputStreamReader(
-			(conn.getInputStream())));
+                    
                 
-                 String line;
-                StringBuffer response = new StringBuffer();
-                
-                
-                
-                
-                while ((line = br.readLine()) != null) {
-				response.append(line);
-			}
-               JSONObject json = new JSONObject(response.toString());
-          
+            JSONObject JSONObject =  createJSONObject(line, conn);
      
-		json.getJSONArray("results").length();
+		JSONObject.getJSONArray("results").length();
                 
-                for(int i = 0; i < json.getJSONArray("results").length(); i++)
+                for(int i = 0; i < JSONObject.getJSONArray("results").length(); i++)
                 
                 {
-                    results +=  json.getJSONArray("results").getJSONObject(i).get("title") + "\n";
+                    results +=  JSONObject.getJSONArray("results").getJSONObject(i).get("title") + "\n";
                 
                 }
                 
                 conn.disconnect();
 
 	  } catch (MalformedURLException e) {
-
-		e.printStackTrace();
-
 	  } catch (IOException e) {
-
-		e.printStackTrace();
-
 	  }
      
              return results;
